@@ -1,178 +1,110 @@
+name := "spark-core"
+organization := "co.supsoft"
 scalaVersion := "2.12.4"
+version := "2.4.0-SNAPSHOT"
 
+val jettyVersion = "9.4.8.v20171121"
+val slf4jVersion = "1.7.16"
 
-
-val jettyVersion = "9.3.20.v20170531"
-
-val slf4j.version = "1.7.16"
+val sparkStableVersion = "2.3.0"
 
 libraryDependencies ++= Seq(
-    "org.apache.avro" % "avro" % "1.7.7"
-    "org.apache.avro" % "avro-mapred" % "1.7.7" classifier "hadoop2"
-    "com.google.guava" % "guava" % "14.0.1" % Provided
-    "com.twitter"  %% "chill" % "0.8.4"
-    "com.twitter"  % "chill-java" % "0.8.4"
 
-    "org.apache.xbean"  %% "xbean-asm5-shaded" % "4.4"
-    
-    "org.apache.hadoop"  %% "hadoop-client" % "2.7.3"
-    
-    "org.apache.spark"  %% "spark-launcher"
-      <version>${project.version}</version>
-    
-    "org.apache.spark"  %% "spark-kvstore_${scala.binary.version}"
-      <version>${project.version}</version>
-    
-    "org.apache.spark"  %% "spark-network-common_${scala.binary.version}"
-      <version>${project.version}</version>
-    
-    "org.apache.spark"  %% "spark-network-shuffle_${scala.binary.version}"
-      <version>${project.version}</version>
-    
-    "org.apache.spark"  %% "spark-unsafe_${scala.binary.version}"
-      <version>${project.version}</version>
-    
-    "net.java.dev.jets3t"  %% "jets3t"
-    
-    "org.apache.curator"  %% "curator-recipes"
-    
+    "org.apache.avro" % "avro" % "1.7.7",
+    "org.apache.avro" % "avro-mapred" % "1.7.7" classifier "hadoop2",
+    "com.google.guava" % "guava" % "14.0.1" % Provided,
+    "com.twitter"  %% "chill" % "0.8.4",
+    "com.twitter"  % "chill-java" % "0.8.4",
 
-    <!-- Jetty dependencies promoted to compile here so they are shaded
-         and inlined into spark-core jar -->
-    "org.eclipse.jetty"  %% "jetty-plus" % jettyVersion
-    "org.eclipse.jetty"  %% "jetty-security" % jettyVersion
-    "org.eclipse.jetty"  %% "jetty-util" % jettyVersion
-    "org.eclipse.jetty"  %% "jetty-server" % jettyVersion
-    "org.eclipse.jetty"  %% "jetty-http" % jettyVersion
-    "org.eclipse.jetty"  %% "jetty-continuation" % jettyVersion
-    "org.eclipse.jetty"  %% "jetty-servlet" % jettyVersion
-    "org.eclipse.jetty"  %% "jetty-proxy" % jettyVersion
-    "org.eclipse.jetty"  %% "jetty-client" % jettyVersion
-    "org.eclipse.jetty"  %% "jetty-servlets" % jettyVersion
+    "org.apache.xbean"  % "xbean-asm5-shaded" % "4.4",
+    "org.apache.hadoop"  % "hadoop-client" % "2.7.3",
+
+    "co.supsoft" %% "spark-launcher" % sparkStableVersion,
+    "co.supsoft" %% "spark-kvstore" % sparkStableVersion,
+    "co.supsoft" %% "spark-network-common" % sparkStableVersion,
+    "co.supsoft" %% "spark-network-shuffle" % sparkStableVersion,
+    "co.supsoft" %% "spark-unsafe" % sparkStableVersion,
+
+    "net.java.dev.jets3t"  % "jets3t" % "0.9.4",
+    "org.apache.curator"  % "curator-recipes" % "2.6.0",
+    
+    "org.eclipse.jetty" % "jetty-plus" % jettyVersion,
+    "org.eclipse.jetty" % "jetty-security" % jettyVersion,
+    "org.eclipse.jetty" % "jetty-util" % jettyVersion,
+    "org.eclipse.jetty" % "jetty-server" % jettyVersion,
+    "org.eclipse.jetty" % "jetty-http" % jettyVersion,
+    "org.eclipse.jetty" % "jetty-continuation" % jettyVersion,
+    "org.eclipse.jetty" % "jetty-servlet" % jettyVersion,
+    "org.eclipse.jetty" % "jetty-proxy" % jettyVersion,
+    "org.eclipse.jetty" % "jetty-client" % jettyVersion,
+    "org.eclipse.jetty" % "jetty-servlets" % jettyVersion,
 
 
-    "javax.servlet" % "javax.servlet-api" % "3.1.0"
-    "org.apache.commons" % "commons-lang3" % "3.5"
-    "org.apache.commons" % "commons-math3" % "3.4.1"
-    "com.google.code.findbugs" % "jsr305" % "1.3.9"
-    
-    "org.slf4j"  %% "slf4j-api"
-    "org.slf4j"  %% "jul-to-slf4j"
-    "org.slf4j"  %% "jcl-over-slf4j"
-    
-    "log4j"  %% "log4j"
-    
-    "org.slf4j"  %% "slf4j-log4j12"
-    
-    "com.ning"  %% "compress-lzf"
-    
-    "org.xerial.snappy"  %% "snappy-java"
-    
-    "org.lz4"  %% "lz4-java"
-    
-    "com.github.luben"  %% "zstd-jni"
-    
-    "org.roaringbitmap"  %% "RoaringBitmap"
-    
-    "commons-net"  %% "commons-net"
-    
-    "org.scala-lang"  %% "scala-library"
-    
-    "org.json4s"  %% "json4s-jackson_${scala.binary.version}"
-    
-    "org.glassfish.jersey.core"  %% "jersey-client"
-    
-    "org.glassfish.jersey.core"  %% "jersey-common"
-    
-    "org.glassfish.jersey.core"  %% "jersey-server"
-    
-    "org.glassfish.jersey.containers"  %% "jersey-container-servlet"
-    
-    "org.glassfish.jersey.containers"  %% "jersey-container-servlet-core"
-    
-    "io.netty"  %% "netty-all"
-    
-    "io.netty"  %% "netty"
-    
-    "com.clearspring.analytics"  %% "stream"
-    
-    "io.dropwizard.metrics"  %% "metrics-core"
-    
-    "io.dropwizard.metrics"  %% "metrics-jvm"
-    
-    "io.dropwizard.metrics"  %% "metrics-json"
-    
-    "io.dropwizard.metrics"  %% "metrics-graphite"
-    
-    "com.fasterxml.jackson.core"  %% "jackson-databind"
-    
-    "com.fasterxml.jackson.module"  %% "jackson-module-scala_${scala.binary.version}"
-    
-    "org.apache.derby"  %% "derby"
-      <scope>test</scope>
-    
-    "org.apache.ivy"  %% "ivy"
-    
-    "oro"
-      <!-- oro is needed by ivy, but only listed as an optional dependency, so we include it. -->  %% "oro"
-      <version>${oro.version}</version>
-    
-    "org.seleniumhq.selenium"  %% "selenium-java"
-      <scope>test</scope>
-    
-    "org.seleniumhq.selenium"  %% "selenium-htmlunit-driver"
-      <scope>test</scope>
-    
-    <!-- Added for selenium: -->
-    "xml-apis"  %% "xml-apis"
-      <scope>test</scope>
-    
-    "org.hamcrest"  %% "hamcrest-core"
-      <scope>test</scope>
-    
-    "org.hamcrest"  %% "hamcrest-library"
-      <scope>test</scope>
-    
-    "org.mockito"  %% "mockito-core"
-      <scope>test</scope>
-    
-    "org.scalacheck"  %% "scalacheck_${scala.binary.version}"
-      <scope>test</scope>
-    
-    "org.apache.curator"  %% "curator-test"
-      <scope>test</scope>
-    
-    "net.razorvine"  %% "pyrolite"
-      <version>4.13</version>
-      <exclusions>
-        <exclusion>
-          <groupId>net.razorvine"
-     %% "serpent"
-        </exclusion>
-      </exclusions>
-    
-    "net.sf.py4j"  %% "py4j"
-      <version>0.10.6</version>
-    
-    "org.apache.spark"  %% "spark-tags_${scala.binary.version}"
-    
+    "javax.servlet" % "javax.servlet-api" % "3.1.0",
+    "org.apache.commons" % "commons-lang3" % "3.5",
+    "org.apache.commons" % "commons-math3" % "3.4.1",
+    "com.google.code.findbugs" % "jsr305" % "1.3.9",
 
-    "org.apache.spark"  %% "spark-launcher_${scala.binary.version}"
-      <version>${project.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
+    "org.slf4j" % "slf4j-api" % slf4jVersion,
+    "org.slf4j" % "jul-to-slf4j" % slf4jVersion,
+    "org.slf4j" % "jcl-over-slf4j" % slf4jVersion,
+    "log4j" % "log4j" % "1.2.17",
+    "org.slf4j" % "slf4j-log4j12" % slf4jVersion,
     
-
-    <!--
-      This spark-tags test-dep is needed even though it isn't used in this module, otherwise testing-cmds that exclude
-      them will yield errors.
-    -->
-    "org.apache.spark"  %% "spark-tags_${scala.binary.version}"
-      <type>test-jar</type>
-      <scope>test</scope>
+    "com.ning"  % "compress-lzf" % "1.0.3",
     
+    "org.xerial.snappy"  % "snappy-java" % "1.1.7.1",
+    
+    "org.lz4"  % "lz4-java" % "1.4.0",
+    
+    "com.github.luben" % "zstd-jni" % "1.3.2-2",
+    
+    "org.roaringbitmap" % "RoaringBitmap" % "0.5.11",
+    
+    "commons-net" % "commons-net" % "3.1",
+    
+    "org.json4s"  %% "json4s-jackson" % "3.5.3",
+    
+    "org.glassfish.jersey.core" % "jersey-client"  % "2.22.2",
+    "org.glassfish.jersey.core" % "jersey-common" % "2.22.2",
+    "org.glassfish.jersey.core" % "jersey-server" % "2.22.2",
+    "org.glassfish.jersey.containers" % "jersey-container-servlet" % "2.22.2",
+    "org.glassfish.jersey.containers" % "jersey-container-servlet-core" % "2.22.2",
+    
+    "io.netty" % "netty-all" % "4.1.17.Final",
+    "io.netty" % "netty" % "3.9.9.Final",
+    
+    "com.clearspring.analytics" % "stream" % "2.7.0",
+    
+    "io.dropwizard.metrics" % "metrics-core" % "3.1.5",
+    "io.dropwizard.metrics" % "metrics-jvm" % "3.1.5",
+    "io.dropwizard.metrics" % "metrics-json" % "3.1.5",
+    "io.dropwizard.metrics" % "metrics-graphite" % "3.1.5",
+    
+    "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.7.1",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.6.7.1",
+    
+    "org.apache.derby" % "derby" % "10.12.1.1" % Test,
+    "org.seleniumhq.selenium" % "selenium-java" % "2.52.0" % Test,
+    "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0" % Test,
+    "xml-apis" % "xml-apis" % "1.4.01" % Test,
+    "org.hamcrest" % "hamcrest-core" % "1.3" % Test,
+    "org.hamcrest" % "hamcrest-library" % "1.3" % Test,
+    "org.mockito" % "mockito-core" % "1.10.19" % Test,
+    "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
+    "org.apache.curator" % "curator-test" % "2.6.0" % Test,
 
-    "org.apache.commons"  %% "commons-crypto" 
+    "net.razorvine" % "pyrolite" % "4.13",
+    
+    "net.sf.py4j" % "py4j" % "0.10.6",
+    
+    "org.apache.spark" %% "spark-tags" % sparkStableVersion,
+    
+    "org.apache.spark" %% "spark-launcher" % sparkStableVersion,
+    
+    "org.apache.spark" %% "spark-tags" % sparkStableVersion,
+
+    "org.apache.commons" % "commons-crypto" % "1.0.0"
 
     )
     
