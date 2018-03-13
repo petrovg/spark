@@ -6,7 +6,7 @@ version := "2.4.0-SNAPSHOT"
 val jettyVersion = "9.4.8.v20171121"
 val slf4jVersion = "1.7.16"
 
-val sparkStableVersion = "2.3.0"
+val sparkCommonVersion = "2.4.0-SNAPSHOT"
 
 libraryDependencies ++= Seq(
 
@@ -19,11 +19,15 @@ libraryDependencies ++= Seq(
     "org.apache.xbean"  % "xbean-asm5-shaded" % "4.4",
     "org.apache.hadoop"  % "hadoop-client" % "2.7.3",
 
-    "co.supsoft" %% "spark-launcher" % sparkStableVersion,
-    "co.supsoft" %% "spark-kvstore" % sparkStableVersion,
-    "co.supsoft" %% "spark-network-common" % sparkStableVersion,
-    "co.supsoft" %% "spark-network-shuffle" % sparkStableVersion,
-    "co.supsoft" %% "spark-unsafe" % sparkStableVersion,
+    "co.supsoft" %% "spark-launcher" % sparkCommonVersion,
+    "co.supsoft" %% "spark-kvstore" % sparkCommonVersion,
+    "co.supsoft" %% "spark-network-common" % sparkCommonVersion,
+    "co.supsoft" %% "spark-network-shuffle" % sparkCommonVersion,
+    "co.supsoft" %% "spark-unsafe" % sparkCommonVersion,
+    "co.supsoft" %% "spark-tags" % sparkCommonVersion,
+    "co.supsoft" %% "spark-launcher" % sparkCommonVersion,
+    "co.supsoft" %% "spark-tags" % sparkCommonVersion,
+
 
     "net.java.dev.jets3t"  % "jets3t" % "0.9.4",
     "org.apache.curator"  % "curator-recipes" % "2.6.0",
@@ -98,12 +102,6 @@ libraryDependencies ++= Seq(
     
     "net.sf.py4j" % "py4j" % "0.10.6",
     
-    "org.apache.spark" %% "spark-tags" % sparkStableVersion,
-    
-    "org.apache.spark" %% "spark-launcher" % sparkStableVersion,
-    
-    "org.apache.spark" %% "spark-tags" % sparkStableVersion,
-
     "org.apache.commons" % "commons-crypto" % "1.0.0"
 
     )
