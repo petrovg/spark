@@ -32,16 +32,16 @@ libraryDependencies ++= Seq(
     "net.java.dev.jets3t"  % "jets3t" % "0.9.4",
     "org.apache.curator"  % "curator-recipes" % "2.6.0",
     
-    "org.eclipse.jetty" % "jetty-plus" % jettyVersion,
-    "org.eclipse.jetty" % "jetty-security" % jettyVersion,
-    "org.eclipse.jetty" % "jetty-util" % jettyVersion,
-    "org.eclipse.jetty" % "jetty-server" % jettyVersion,
-    "org.eclipse.jetty" % "jetty-http" % jettyVersion,
-    "org.eclipse.jetty" % "jetty-continuation" % jettyVersion,
-    "org.eclipse.jetty" % "jetty-servlet" % jettyVersion,
-    "org.eclipse.jetty" % "jetty-proxy" % jettyVersion,
-    "org.eclipse.jetty" % "jetty-client" % jettyVersion,
-    "org.eclipse.jetty" % "jetty-servlets" % jettyVersion,
+    "org.eclipse.jetty" % "jetty-plus" % jettyVersion % Compile,
+    "org.eclipse.jetty" % "jetty-security" % jettyVersion % Compile,
+    "org.eclipse.jetty" % "jetty-util" % jettyVersion % Compile,
+    "org.eclipse.jetty" % "jetty-server" % jettyVersion % Compile,
+    "org.eclipse.jetty" % "jetty-http" % jettyVersion % Compile,
+    "org.eclipse.jetty" % "jetty-continuation" % jettyVersion % Compile,
+    "org.eclipse.jetty" % "jetty-servlet" % jettyVersion % Compile,
+    "org.eclipse.jetty" % "jetty-proxy" % jettyVersion % Compile,
+    "org.eclipse.jetty" % "jetty-client" % jettyVersion % Compile,
+    "org.eclipse.jetty" % "jetty-servlets" % jettyVersion % Compile,
 
 
     "javax.servlet" % "javax.servlet-api" % "3.1.0",
@@ -89,7 +89,9 @@ libraryDependencies ++= Seq(
     "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.6.7.1",
 
     "org.apache.ivy" % "ivy" % "2.4.0",
-    
+
+    "junit" % "junit" % "4.12" % Test,
+    "org.scalatest" %% "scalatest" % "3.0.3" % Test,
     "org.apache.derby" % "derby" % "10.12.1.1" % Test,
     "org.seleniumhq.selenium" % "selenium-java" % "2.52.0" % Test,
     "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0" % Test,
