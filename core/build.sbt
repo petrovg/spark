@@ -87,6 +87,8 @@ libraryDependencies ++= Seq(
     
     "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.7.1",
     "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.6.7.1",
+
+    "org.apache.ivy" % "ivy" % "2.4.0",
     
     "org.apache.derby" % "derby" % "10.12.1.1" % Test,
     "org.seleniumhq.selenium" % "selenium-java" % "2.52.0" % Test,
