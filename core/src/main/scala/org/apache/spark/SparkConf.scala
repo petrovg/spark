@@ -67,31 +67,38 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging with Seria
   }
 
   if (loadDefaults) {
-    loadFromSystemProperties(false)
+    loadFromSystemProperties()
   }
 
-  private[spark] def loadFromSystemProperties(silent: Boolean): SparkConf = {
+  private[spark] def loadFromSystemProperties(): SparkConf = {
     // Load any spark.* system properties
     for ((key, value) <- Utils.getSystemProperties if key.startsWith("spark.")) {
-      set(key, value, silent)
+      log.info(s"Setting spark system property $key=$value")
+      set(key, value)
     }
     this
   }
 
-  /** Set a configuration variable. */
+  def setOptional(key: String, value: String) = {
+    if (key == null)
+      throw new IllegalStateException("Somehow got a null key?!. The value is " + value)
+    else if (value != null)
+      settings.put(key, value)
+    this
+  }
+
+  /** Set a configuration variable enforcing a non-null. */
   def set(key: String, value: String): SparkConf = {
     set(key, value, false)
   }
 
+  // TODO remove silent
   private[spark] def set(key: String, value: String, silent: Boolean): SparkConf = {
     if (key == null) {
       throw new NullPointerException("null key")
     }
     if (value == null) {
       throw new NullPointerException("null value for " + key)
-    }
-    if (!silent) {
-      logDeprecationWarning(key)
     }
     settings.put(key, value)
     this
@@ -437,7 +444,7 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging with Seria
   override def clone: SparkConf = {
     val cloned = new SparkConf(false)
     settings.entrySet().asScala.foreach { e =>
-      cloned.set(e.getKey(), e.getValue(), true)
+      cloned.set(e.getKey(), e.getValue())
     }
     cloned
   }

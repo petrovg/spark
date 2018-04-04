@@ -25,8 +25,6 @@ import scala.tools.nsc.GenericRunnerSettings
 
 import org.apache.spark._
 import org.apache.spark.internal.Logging
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.internal.StaticSQLConf.CATALOG_IMPLEMENTATION
 import org.apache.spark.util.Utils
 
 object Main extends Logging {
@@ -34,14 +32,7 @@ object Main extends Logging {
   initializeLogIfNecessary(true)
   Signaling.cancelOnInterrupt()
 
-  val conf = new SparkConf()
-  val rootDir = conf.getOption("spark.repl.classdir").getOrElse(Utils.getLocalDir(conf))
-  val outputDir = Utils.createTempDir(root = rootDir, namePrefix = "repl")
-
-  var sparkContext: SparkContext = _
-  var sparkSession: SparkSession = _
-  // this is a public var because tests reset it.
-  var interp: SparkILoop = _
+  private var sparkContext: SparkContext = _
 
   private var hasErrors = false
 
@@ -52,22 +43,31 @@ object Main extends Logging {
     // scalastyle:on println
   }
 
-  def main(args: Array[String]) {
-    doMain(args, new SparkILoop)
-  }
+  def main(args: Array[String]): Unit = doMain(args, new SparkILoop)(new SparkConf())
+
+  def startShell(args: Array[String])(implicit conf: SparkConf): Unit =
+      doMain(args, new SparkILoop())
 
   // Visible for testing
-  private[repl] def doMain(args: Array[String], _interp: SparkILoop): Unit = {
-    interp = _interp
+  private[repl] def doMain(args: Array[String], interp: SparkILoop)(implicit conf: SparkConf): Unit = {
+    val rootDir = conf.getOption("spark.repl.classdir").getOrElse(Utils.getLocalDir(conf))
+    val outputDir = Utils.createTempDir(root = rootDir, namePrefix = "repl")
+
     val jars = Utils.getLocalUserJarsForShell(conf)
       // Remove file:///, file:// or file:/ scheme if exists for each jar
       .map { x => if (x.startsWith("file:")) new File(new URI(x)).getPath else x }
       .mkString(File.pathSeparator)
+
+    println(">>>>> JARS (passed over to interpreter): " + jars)
+
     val interpArguments = List(
       "-Yrepl-class-based",
       "-Yrepl-outdir", s"${outputDir.getAbsolutePath}",
       "-classpath", jars
     ) ++ args.toList
+
+    println(">>>> Interpreting with arguments: " + interpArguments)
+    println(">>>> Interpreting with conf: " + conf.getAll.mkString("\n"))
 
     val settings = new GenericRunnerSettings(scalaOptionError)
     settings.processArguments(interpArguments, true)
@@ -78,7 +78,7 @@ object Main extends Logging {
     }
   }
 
-  def createSparkSession(): SparkSession = {
+  private def createSparkContext(conf: SparkConf, outputDir: File): SparkContext = {
     val execUri = System.getenv("SPARK_EXECUTOR_URI")
     conf.setIfMissing("spark.app.name", "Spark shell")
     // SparkContext will detect this configuration and register it with the RpcEnv's
@@ -94,29 +94,10 @@ object Main extends Logging {
       conf.setSparkHome(System.getenv("SPARK_HOME"))
     }
 
-    val builder = SparkSession.builder.config(conf)
-    if (conf.get(CATALOG_IMPLEMENTATION.key, "hive").toLowerCase(Locale.ROOT) == "hive") {
-      if (SparkSession.hiveClassesArePresent) {
-        // In the case that the property is not set at all, builder's config
-        // does not have this value set to 'hive' yet. The original default
-        // behavior is that when there are hive classes, we use hive catalog.
-        sparkSession = builder.enableHiveSupport().getOrCreate()
-        logInfo("Created Spark session with Hive support")
-      } else {
-        // Need to change it back to 'in-memory' if no hive classes are found
-        // in the case that the property is set to hive in spark-defaults.conf
-        builder.config(CATALOG_IMPLEMENTATION.key, "in-memory")
-        sparkSession = builder.getOrCreate()
-        logInfo("Created Spark session")
-      }
-    } else {
-      // In the case that the property is set but not to 'hive', the internal
-      // default is 'in-memory'. So the sparkSession will use in-memory catalog.
-      sparkSession = builder.getOrCreate()
-      logInfo("Created Spark session")
-    }
-    sparkContext = sparkSession.sparkContext
-    sparkSession
+    logInfo("Created Spark context")
+
+    new SparkContext(conf)
+
   }
 
 }

@@ -29,7 +29,6 @@ import scala.collection.mutable.{ArrayBuffer, HashMap}
 import scala.io.Source
 import scala.util.Try
 
-import org.apache.spark.deploy.SparkSubmitAction._
 import org.apache.spark.launcher.SparkSubmitArgumentsParser
 import org.apache.spark.network.util.JavaUtils
 import org.apache.spark.util.Utils
@@ -68,7 +67,7 @@ private[deploy] class SparkSubmitArguments(args: Seq[String], env: Map[String, S
   var isPython: Boolean = false
   var pyFiles: String = null
   var isR: Boolean = false
-  var action: SparkSubmitAction = null
+  var action: String = null
   val sparkProperties: HashMap[String, String] = new HashMap[String, String]()
   var proxyUser: String = null
   var principal: String = null
@@ -80,6 +79,12 @@ private[deploy] class SparkSubmitArguments(args: Seq[String], env: Map[String, S
   var submissionToKill: String = null
   var submissionToRequestStatusFor: String = null
   var useRest: Boolean = true // used internally
+
+  object Action {
+    val Submit = "submit"
+    val Kill = "kill"
+    val RequestStatus = "status"
+  }
 
   /** Default properties present in the currently defined defaults file. */
   lazy val defaultSparkProperties: HashMap[String, String] = {
@@ -237,15 +242,15 @@ private[deploy] class SparkSubmitArguments(args: Seq[String], env: Map[String, S
     }
 
     // Action should be SUBMIT unless otherwise specified
-    action = Option(action).getOrElse(SUBMIT)
+    action = Option(action).getOrElse("submit")
   }
 
   /** Ensure that required fields exists. Call this only once all defaults are loaded. */
   private def validateArguments(): Unit = {
     action match {
-      case SUBMIT => validateSubmitArguments()
-      case KILL => validateKillArguments()
-      case REQUEST_STATUS => validateStatusRequestArguments()
+      case Action.Submit => validateSubmitArguments()
+      case Action.Kill => validateKillArguments()
+      case Action.RequestStatus => validateStatusRequestArguments()
     }
   }
 
@@ -255,9 +260,6 @@ private[deploy] class SparkSubmitArguments(args: Seq[String], env: Map[String, S
     }
     if (primaryResource == null) {
       SparkSubmit.printErrorAndExit("Must specify a primary resource (JAR or Python or R file)")
-    }
-    if (mainClass == null && SparkSubmit.isUserJar(primaryResource)) {
-      SparkSubmit.printErrorAndExit("No main class set in JAR; please specify one with --class")
     }
     if (driverMemory != null
         && Try(JavaUtils.byteStringAsBytes(driverMemory)).getOrElse(-1L) <= 0) {
@@ -403,16 +405,16 @@ private[deploy] class SparkSubmitArguments(args: Seq[String], env: Map[String, S
       case KILL_SUBMISSION =>
         submissionToKill = value
         if (action != null) {
-          SparkSubmit.printErrorAndExit(s"Action cannot be both $action and $KILL.")
+          SparkSubmit.printErrorAndExit(s"Action cannot be both $action and ${Action.Kill}.")
         }
-        action = KILL
+        action = Action.Kill
 
       case STATUS =>
         submissionToRequestStatusFor = value
         if (action != null) {
-          SparkSubmit.printErrorAndExit(s"Action cannot be both $action and $REQUEST_STATUS.")
+          SparkSubmit.printErrorAndExit(s"Action cannot be both $action and ${Action.RequestStatus}.")
         }
-        action = REQUEST_STATUS
+        action = Action.RequestStatus
 
       case SUPERVISE =>
         supervise = true
@@ -482,15 +484,7 @@ private[deploy] class SparkSubmitArguments(args: Seq[String], env: Map[String, S
     if (opt.startsWith("-")) {
       SparkSubmit.printErrorAndExit(s"Unrecognized option '$opt'.")
     }
-
-    primaryResource =
-      if (!SparkSubmit.isShell(opt) && !SparkSubmit.isInternal(opt)) {
-        Utils.resolveURI(opt).toString
-      } else {
-        opt
-      }
-    isPython = SparkSubmit.isPython(opt)
-    isR = SparkSubmit.isR(opt)
+    primaryResource = opt
     false
   }
 
@@ -592,11 +586,6 @@ private[deploy] class SparkSubmitArguments(args: Seq[String], env: Map[String, S
         |                              delegation tokens periodically.
       """.stripMargin
     )
-
-    if (SparkSubmit.isSqlShell(mainClass)) {
-      outStream.println("CLI options:")
-      outStream.println(getSqlShellOptions())
-    }
     // scalastyle:on println
 
     SparkSubmit.exitFn(exitCode)

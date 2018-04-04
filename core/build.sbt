@@ -16,6 +16,9 @@ libraryDependencies ++= Seq(
     "com.twitter"  %% "chill" % "0.8.4",
     "com.twitter"  % "chill-java" % "0.8.4",
 
+
+    "org.scala-lang" % "scala-compiler" % "2.12.4",
+
     "org.apache.xbean"  % "xbean-asm5-shaded" % "4.4",
     "org.apache.hadoop"  % "hadoop-client" % "2.7.3",
 

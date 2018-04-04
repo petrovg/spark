@@ -468,7 +468,7 @@ private[spark] object Utils extends Logging {
       val cachedFile = new File(localDir, cachedFileName)
       try {
         if (!cachedFile.exists()) {
-          doFetchFile(url, localDir, cachedFileName, conf, securityMgr, hadoopConf)
+          doFetchFile(url, localDir, cachedFileName, conf, securityMgr)
         }
       } finally {
         lock.release()
@@ -481,7 +481,7 @@ private[spark] object Utils extends Logging {
         conf.getBoolean("spark.files.overwrite", false)
       )
     } else {
-      doFetchFile(url, targetDir, fileName, conf, securityMgr, hadoopConf)
+      doFetchFile(url, targetDir, fileName, conf, securityMgr)
     }
 
     // Decompress the file if it's a .tar or .tar.gz
@@ -646,8 +646,7 @@ private[spark] object Utils extends Logging {
       targetDir: File,
       filename: String,
       conf: SparkConf,
-      securityMgr: SecurityManager,
-      hadoopConf: Configuration): File = {
+      securityMgr: SecurityManager): File = {
     val targetFile = new File(targetDir, filename)
     val uri = new URI(url)
     val fileOverwrite = conf.getBoolean("spark.files.overwrite", defaultValue = false)
@@ -684,11 +683,8 @@ private[spark] object Utils extends Logging {
         // Note the difference between uri vs url.
         val sourceFile = if (uri.isAbsolute) new File(uri) else new File(url)
         copyFile(url, sourceFile, targetFile, fileOverwrite)
-      case _ =>
-        val fs = getHadoopFileSystem(uri, hadoopConf)
-        val path = new Path(uri)
-        fetchHcfsFile(path, targetDir, fs, conf, hadoopConf, fileOverwrite,
-                      filename = Some(filename))
+      case other =>
+        throw new IllegalArgumentException("Unsupported protocol: " + other)
     }
 
     targetFile
@@ -2515,6 +2511,7 @@ private[spark] object Utils extends Logging {
    * SparkSubmit at first.
    */
   def getLocalUserJarsForShell(conf: SparkConf): Seq[String] = {
+    println(">>>>> local jars: " + conf.getOption("spark.repl.local.jars"))
     val localJars = conf.getOption("spark.repl.local.jars")
     localJars.map(_.split(",")).map(_.filter(_.nonEmpty)).toSeq.flatten
   }

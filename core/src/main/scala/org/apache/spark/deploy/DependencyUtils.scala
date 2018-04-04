@@ -53,18 +53,17 @@ private[deploy] object DependencyUtils {
       jars: String,
       userJar: String,
       sparkConf: SparkConf,
-      hadoopConf: Configuration,
       secMgr: SecurityManager): String = {
     val targetDir = Utils.createTempDir()
     Option(jars)
       .map {
-        resolveGlobPaths(_, hadoopConf)
+        resolveGlobPaths(_)
           .split(",")
           .filterNot(_.contains(userJar.split("/").last))
           .mkString(",")
       }
       .filterNot(_ == "")
-      .map(downloadFileList(_, targetDir, sparkConf, hadoopConf, secMgr))
+      .map(downloadFileList(_, targetDir, sparkConf, secMgr))
       .orNull
   }
 
@@ -91,11 +90,10 @@ private[deploy] object DependencyUtils {
       fileList: String,
       targetDir: File,
       sparkConf: SparkConf,
-      hadoopConf: Configuration,
       secMgr: SecurityManager): String = {
     require(fileList != null, "fileList cannot be null.")
     Utils.stringToSeq(fileList)
-      .map(downloadFile(_, targetDir, sparkConf, hadoopConf, secMgr))
+      .map(downloadFile(_, targetDir, sparkConf, secMgr))
       .mkString(",")
   }
 
@@ -114,7 +112,6 @@ private[deploy] object DependencyUtils {
       path: String,
       targetDir: File,
       sparkConf: SparkConf,
-      hadoopConf: Configuration,
       secMgr: SecurityManager): String = {
     require(path != null, "path cannot be null.")
     val uri = Utils.resolveURI(path)
@@ -128,23 +125,18 @@ private[deploy] object DependencyUtils {
         new File(targetDir, file.getName).toURI.toString
       case _ =>
         val fname = new Path(uri).getName()
-        val localFile = Utils.doFetchFile(uri.toString(), targetDir, fname, sparkConf, secMgr,
-          hadoopConf)
+        val localFile = Utils.doFetchFile(uri.toString(), targetDir, fname, sparkConf, secMgr)
         localFile.toURI().toString()
     }
   }
 
-  def resolveGlobPaths(paths: String, hadoopConf: Configuration): String = {
+  def resolveGlobPaths(paths: String): String = {
     require(paths != null, "paths cannot be null.")
     Utils.stringToSeq(paths).flatMap { path =>
       val uri = Utils.resolveURI(path)
       uri.getScheme match {
         case "local" | "http" | "https" | "ftp" => Array(path)
-        case _ =>
-          val fs = FileSystem.get(uri, hadoopConf)
-          Option(fs.globStatus(new Path(uri))).map { status =>
-            status.filter(_.isFile).map(_.getPath.toUri.toString)
-          }.getOrElse(Array(path))
+        case other => throw new IllegalArgumentException(s"Unsupported protocol $other in uri $uri")
       }
     }.mkString(",")
   }
