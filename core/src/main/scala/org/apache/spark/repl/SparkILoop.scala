@@ -18,6 +18,7 @@
 package org.apache.spark.repl
 
 import java.io.BufferedReader
+import java.net.URLClassLoader
 
 import scala.tools.nsc.Settings
 import scala.tools.nsc.interpreter.{ILoop, JPrintWriter}
@@ -34,36 +35,9 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
 
   val initializationCommands: Seq[String] = Seq(
     """
-    @transient val spark = if (org.apache.spark.repl.Main.sparkSession != null) {
-        org.apache.spark.repl.Main.sparkSession
-      } else {
-        org.apache.spark.repl.Main.createSparkSession()
-      }
-    @transient val sc = {
-      val _sc = spark.sparkContext
-      if (_sc.getConf.getBoolean("spark.ui.reverseProxy", false)) {
-        val proxyUrl = _sc.getConf.get("spark.ui.reverseProxyUrl", null)
-        if (proxyUrl != null) {
-          println(
-            s"Spark Context Web UI is available at ${proxyUrl}/proxy/${_sc.applicationId}")
-        } else {
-          println(s"Spark Context Web UI is available at Spark Master Public URL")
-        }
-      } else {
-        _sc.uiWebUrl.foreach {
-          webUrl => println(s"Spark context Web UI available at ${webUrl}")
-        }
-      }
-      println("Spark context available as 'sc' " +
-        s"(master = ${_sc.master}, app id = ${_sc.applicationId}).")
-      println("Spark session available as 'spark'.")
-      _sc
-    }
+    @transient val sc = org.apache.spark.repl.Main.sparkContext
     """,
-    "import org.apache.spark.SparkContext._",
-    "import spark.implicits._",
-    "import spark.sql",
-    "import org.apache.spark.sql.functions._"
+    "import org.apache.spark.SparkContext._"
   )
 
   def initializeSpark() = {
@@ -105,6 +79,9 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
   override def createInterpreter(): Unit = {
     super.createInterpreter()
     println(">>>>> Interpreter settings: " + intp.settings)
+    val classLoader: URLClassLoader = this.getClass.getClassLoader.asInstanceOf[URLClassLoader]
+    println(">>>>> This process' classpath: " + classLoader.getURLs.mkString(java.io.File.pathSeparator))
+
     initializeSpark()
   }
 

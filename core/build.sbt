@@ -70,7 +70,7 @@ libraryDependencies ++= Seq(
     
     "commons-net" % "commons-net" % "3.1",
     
-    "org.json4s"  %% "json4s-jackson" % "3.5.3",
+    "org.json4s"  %% "json4s-jackson" % "3.5.3" excludeAll(ExclusionRule("com.fasterxml.jackson.core")),
     
     "org.glassfish.jersey.core" % "jersey-client"  % "2.22.2",
     "org.glassfish.jersey.core" % "jersey-common" % "2.22.2",

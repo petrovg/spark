@@ -18,11 +18,10 @@
 package org.apache.spark.repl
 
 import java.io.File
-import java.net.URI
+import java.net.{URI, URLClassLoader}
 import java.util.Locale
 
 import scala.tools.nsc.GenericRunnerSettings
-
 import org.apache.spark._
 import org.apache.spark.internal.Logging
 import org.apache.spark.util.Utils
@@ -32,7 +31,13 @@ object Main extends Logging {
   initializeLogIfNecessary(true)
   Signaling.cancelOnInterrupt()
 
-  private var sparkContext: SparkContext = _
+  lazy val conf = new SparkConf()
+
+  lazy val rootDir = conf.getOption("spark.repl.classdir").getOrElse(Utils.getLocalDir(conf))
+
+  lazy val outputDir = Utils.createTempDir(root = rootDir, namePrefix = "repl")
+
+  lazy val sparkContext: SparkContext = createSparkContext(conf, outputDir)
 
   private var hasErrors = false
 
@@ -43,20 +48,21 @@ object Main extends Logging {
     // scalastyle:on println
   }
 
-  def main(args: Array[String]): Unit = doMain(args, new SparkILoop)(new SparkConf())
+  def main(args: Array[String]): Unit = doMain(args, new SparkILoop)(conf)
 
   def startShell(args: Array[String])(implicit conf: SparkConf): Unit =
       doMain(args, new SparkILoop())
 
   // Visible for testing
   private[repl] def doMain(args: Array[String], interp: SparkILoop)(implicit conf: SparkConf): Unit = {
-    val rootDir = conf.getOption("spark.repl.classdir").getOrElse(Utils.getLocalDir(conf))
-    val outputDir = Utils.createTempDir(root = rootDir, namePrefix = "repl")
 
-    val jars = Utils.getLocalUserJarsForShell(conf)
+    val jarsOOO = Utils.getLocalUserJarsForShell(conf)
       // Remove file:///, file:// or file:/ scheme if exists for each jar
       .map { x => if (x.startsWith("file:")) new File(new URI(x)).getPath else x }
       .mkString(File.pathSeparator)
+
+    val classLoader: URLClassLoader = this.getClass.getClassLoader.asInstanceOf[URLClassLoader]
+    val jars = classLoader.getURLs.mkString(java.io.File.pathSeparator)
 
     println(">>>>> JARS (passed over to interpreter): " + jars)
 
@@ -78,7 +84,7 @@ object Main extends Logging {
     }
   }
 
-  private def createSparkContext(conf: SparkConf, outputDir: File): SparkContext = {
+  def createSparkContext(conf: SparkConf, outputDir: File): SparkContext = {
     val execUri = System.getenv("SPARK_EXECUTOR_URI")
     conf.setIfMissing("spark.app.name", "Spark shell")
     // SparkContext will detect this configuration and register it with the RpcEnv's
