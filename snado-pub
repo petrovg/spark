@@ -1,0 +1,13 @@
+#!/bin/zsh
+
+function pub() {
+  cd $1
+  sbt publishLocal
+  cd -
+}
+
+pub common/tags 
+pub common/unsafe
+pub common/kvstore
+pub common/network-common
+pub common/network-shuffle

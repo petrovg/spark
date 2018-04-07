@@ -1037,7 +1037,7 @@ private[deploy] class Master(
   }
 }
 
-private[deploy] object Master extends Logging {
+object Master extends Logging {
   val SYSTEM_NAME = "sparkMaster"
   val ENDPOINT_NAME = "Master"
 

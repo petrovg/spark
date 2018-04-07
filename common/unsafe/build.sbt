@@ -19,6 +19,4 @@ libraryDependencies ++= Seq(
     "org.scalatest" %% "scalatest" % "3.0.3" % Test,
     "org.mockito" % "mockito-core" % "1.10.19" % Test,
     "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
-    "org.apache.commons" % "commons-lang3" % "3.5" % Test,
-
-    )
+    "org.apache.commons" % "commons-lang3" % "3.5" % Test )
