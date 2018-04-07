@@ -18,12 +18,13 @@
 package org.apache.spark.deploy
 
 import java.io.File
+import java.net.URI
 
 import org.apache.commons.lang3.StringUtils
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 
-import org.apache.spark.{SecurityManager, SparkConf}
+import org.apache.spark.{SecurityManager, SparkConf, SparkException}
 import org.apache.spark.util.{MutableURLClassLoader, Utils}
 
 private[deploy] object DependencyUtils {
