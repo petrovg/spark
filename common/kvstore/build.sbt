@@ -11,9 +11,9 @@ libraryDependencies ++= Seq(
 
     "com.google.guava" % "guava" % "14.0.1",
 
-    "com.fasterxml.jackson.core" % "jackson-core" % "2.9.4",
-    "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.4",
-    "com.fasterxml.jackson.core" % "jackson-annotations" % "2.9.4",
+    "com.fasterxml.jackson.core" % "jackson-core" % "2.6.7",
+    "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.7.1",
+    "com.fasterxml.jackson.core" % "jackson-annotations" % "2.6.7",
 
     "org.fusesource.leveldbjni" % "leveldbjni-all" % "1.8",
 

@@ -327,6 +327,7 @@ object SparkSubmit extends CommandLineUtils with Logging {
     }
 
     try {
+      println(s">>>> STARTING ${childArgs.toArray.mkString(", ")}, ${sparkConf.toDebugString}")
       app.start(childArgs.toArray, sparkConf)
     } catch {
       case t: Throwable =>

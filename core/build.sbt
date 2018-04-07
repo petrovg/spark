@@ -93,6 +93,9 @@ libraryDependencies ++= Seq(
 
     "org.apache.ivy" % "ivy" % "2.4.0",
 
+    "org.apache.hadoop" % "hadoop-common" % "3.1.0" % Runtime,
+    "org.apache.hadoop" % "hadoop-aws" % "3.1.0" % Runtime,
+
     "junit" % "junit" % "4.12" % Test,
     "org.scalatest" %% "scalatest" % "3.0.3" % Test,
     "org.apache.derby" % "derby" % "10.12.1.1" % Test,
