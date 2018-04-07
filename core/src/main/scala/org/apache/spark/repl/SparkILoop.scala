@@ -44,7 +44,6 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
     intp.beQuietDuring {
       savingReplayStack { // remove the commands from session history.
         initializationCommands.foreach { c =>
-          println(">>>>> > Executing: " + c)
           command(c)
         }
       }
@@ -78,10 +77,7 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
    */
   override def createInterpreter(): Unit = {
     super.createInterpreter()
-    println(">>>>> Interpreter settings: " + intp.settings)
     val classLoader: URLClassLoader = this.getClass.getClassLoader.asInstanceOf[URLClassLoader]
-    println(">>>>> This process' classpath: " + classLoader.getURLs.mkString(java.io.File.pathSeparator))
-
     initializeSpark()
   }
 

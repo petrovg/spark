@@ -89,7 +89,7 @@ object DriverWrapper extends Logging {
       ).map(sys.props.get(_).orNull)
 
     val resolvedMavenCoordinates = DependencyUtils.resolveMavenDependencies(packagesExclusions,
-      packages, repositories, ivyRepoPath, Option(ivySettingsPath))
+      packages, repositories, ivyRepoPath)
     val jars = {
       val jarsProp = sys.props.get("spark.jars").orNull
       if (!StringUtils.isBlank(resolvedMavenCoordinates)) {

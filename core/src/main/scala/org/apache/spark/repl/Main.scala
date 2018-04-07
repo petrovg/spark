@@ -64,16 +64,11 @@ object Main extends Logging {
     val classLoader: URLClassLoader = this.getClass.getClassLoader.asInstanceOf[URLClassLoader]
     val jars = classLoader.getURLs.mkString(java.io.File.pathSeparator)
 
-    println(">>>>> JARS (passed over to interpreter): " + jars)
-
     val interpArguments = List(
       "-Yrepl-class-based",
       "-Yrepl-outdir", s"${outputDir.getAbsolutePath}",
       "-classpath", jars
     ) ++ args.toList
-
-    println(">>>> Interpreting with arguments: " + interpArguments)
-    println(">>>> Interpreting with conf: " + conf.getAll.mkString("\n"))
 
     val settings = new GenericRunnerSettings(scalaOptionError)
     settings.processArguments(interpArguments, true)

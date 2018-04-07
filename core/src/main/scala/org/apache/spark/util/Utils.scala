@@ -2515,7 +2515,6 @@ private[spark] object Utils extends Logging {
    * SparkSubmit at first.
    */
   def getLocalUserJarsForShell(conf: SparkConf): Seq[String] = {
-    println(">>>>> local jars: " + conf.getOption("spark.repl.local.jars"))
     val localJars = conf.getOption("spark.repl.local.jars")
     localJars.map(_.split(",")).map(_.filter(_.nonEmpty)).toSeq.flatten
   }
